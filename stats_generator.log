@@ -1,0 +1,27 @@
+README
+=======
+
+++ Description
+	- This is a simple script that extracts data from a database after a specified interval, creates a csv file of the data and sends an email with the file as an attachment.
+	- Utilises inmemory Db and supervisor
+	- Check out the sample config file
+	- Developed for linux
+	- Change necessary configs and directories to match your environment
+	
+++ Dependencies
+	- Python 2.7
+	- pydblite
+	- run script via supervisor
+
+++ Others
+
+	full path - /opt/scripts/stats_gen/stats_generator.py
+
+	#Supervisor config
+	[program:stats_gen]
+	directory=/opt/scripts/stats_gen/
+	command=python /opt/scripts/stats_gen/stats_generator.py
+	autostart=true
+	startsecs=0
+	autorestart=false
+	redirect_stderr=true
