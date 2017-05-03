@@ -1,8 +1,8 @@
-#!/usr/bin/python2.7
+# !/usr/bin/python2.7
 # coding=utf-8
 # -*- coding: utf-8 -*-
-#Stats Gen
-#Muchina
+# Stats Gen
+# Muchina
 
 import smtplib
 import psycopg2
@@ -24,7 +24,7 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from string import Template
-#In memory DB
+# In memory DB
 from pydblite.pydblite import Base
 from datetime import datetime
 
@@ -41,10 +41,10 @@ db_username = config.get('db', 'db_username')
 db_password = config.get('db', 'db_password')
 db_name = config.get('db', 'db_name')
 
-#Others
+# Others
 sleep_int = config.get('others', 'sleep_interval')
 
-#Email
+# Email
 recep_list = config.get('email', 'recep_list')
 
 
@@ -68,11 +68,11 @@ def get_time_range():
         log.info("In-memory DB exists. Path - " + db_path)
         db.open()
         record = db(fk_index=1)
-        #Get first record from list
+        # Get first record from list
         start_time = record[0]
-        #Using id as key of the map, get the value
+        # Using id as key of the map, get the value
         start_time = start_time['last_time']
-        #Update last time
+        # Update last time
         db.update(record, last_time=end_time)
         db.commit()
         record = db(fk_index=1)
@@ -81,7 +81,7 @@ def get_time_range():
     else:
         log.info("Creating in-memory DB. Path - " + db_path)
         db.create('fk_index', 'last_time')
-        #Insert records for next read
+        # Insert records for next read
         db.insert(last_time=end_time, fk_index=1)
         db.commit()
         start_time = str(datetime.now().strftime("%Y-%m-%d 00:00:00.000000"))
@@ -119,7 +119,7 @@ def get_data():
     result_principal_recovery_amt = get_data_without_params(principal_recovery_amt)
     result_service_fee_amt = get_data_without_params(service_fee_amt)
 
-    #generating file name
+    # generating file name
     st = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S.%f')
     stf = st.strftime('%Y%m%d%H%M%S%f')
     fn = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S.%f')
@@ -127,29 +127,29 @@ def get_data():
     filename = str(stf) + '_' + str(fnf) + '_OOC_Data.csv'
     log.info('File name - ' + filename)
 
-    #Print records
-    #print 'Period_start_timestamp', 'Period_end_timestamp', 'lending_txs', 'LBN_counts', 'Principal_recovery_txs', 'Principal_recovery_amount', 'Service_fee_amount'
-    #print result_lending_txn_count[0], result_lbn_count[0], result_principal_recovery_count[0], result_principal_recovery_amt[0], result_service_fee_amt[0]
+    # Print records
+    # print 'Period_start_timestamp', 'Period_end_timestamp', 'lending_txs', 'LBN_counts', 'Principal_recovery_txs', 'Principal_recovery_amount', 'Service_fee_amount'
+    # print result_lending_txn_count[0], result_lbn_count[0], result_principal_recovery_count[0], result_principal_recovery_amt[0], result_service_fee_amt[0]
 
-    #Generating file
+    # Generating file
     csv_file = '/tmp/' + filename
     try:
         f = open(csv_file, 'w')
         c = csv.writer(f)
-        #Write headers
+        # Write headers
         c.writerow(('Period_start_timestamp', 'Period_end_timestamp', 'lending_txs', 'LBN_counts', 'Principal_recovery_txs', 'Principal_recovery_amount', 'Service_fee_amount'))
-        #Write data
+        # Write data
         c.writerow((start_time,end_time,result_lending_txn_count[0], result_lbn_count[0], result_principal_recovery_count[0], result_principal_recovery_amt[0], result_service_fee_amt[0]))
     except Exception, e:
         log.error("Error :" + format(e.message))
     finally:
         f.close()
-    #send file
+    # send file
     message = "Hi, attached is the file containing the generated statistics. In case of any queries kindly contact test@gmail.com"
     print csv_file
     sendEmail(message, recep_list, csv_file, filename)
     log.info('File sent')
-    #Delete file
+    # Delete file
     delete_file(csv_file)
 
 
@@ -218,5 +218,5 @@ def main():
         log.error("Error :" + format(e.message))
 
 
-#Run the main function
+# Run the main function
 main()
