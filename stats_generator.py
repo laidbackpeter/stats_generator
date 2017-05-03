@@ -4,32 +4,27 @@
 # Stats Gen
 # Muchina
 
-import smtplib
-import psycopg2
 import ConfigParser
-import logging
-import urllib2
-import json
-import time
-import datetime
-import os
-import sys
 import csv
+import datetime
+import logging
 import mimetypes
+import os
+import smtplib
+import time
+from datetime import datetime
 from email import encoders
-from email.message import Message
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from string import Template
-# In memory DB
+
+import psycopg2
 from pydblite.pydblite import Base
-from datetime import datetime
 
-
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)s] (%(threadName)-10s) %(message)s', filename='/opt/scripts/stats_gen/logs/stats_gen.log')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)s] (%(threadName)-10s) %(message)s',
+                    filename='/opt/scripts/stats_gen/logs/stats_gen.log')
 log = logging.getLogger("reminder")
 
 config = ConfigParser.ConfigParser()
@@ -55,7 +50,7 @@ def db_conn():
         cursor = db.cursor()
         log.info("Connected to " + db_name + " on IP " + db_host)
     except Exception, e:
-        log.error("!dbConnection : "+format(e.message))
+        log.error("!dbConnection : " + format(e.message))
 
 
 def get_time_range():
@@ -107,11 +102,16 @@ def delete_file(file_name):
 
 
 def get_data():
-    lending_txn_count = "select count(*) from tbl_loans where loan_time >= '%s' and loan_time < '%s'" % (start_time, end_time)
-    lbn_count = "select count(*) from tbl_auto_sms_notifications where sms_timestamp >= '%s' and sms_timestamp < '%s' and sms_message='not-subscribed'" % (start_time, end_time)
-    principal_recovery_count = "select count(*) from tbl_loans_repay where event_time >= '%s' and event_time < '%s' and cents_principal > 0" % (start_time, end_time)
-    principal_recovery_amt = "select coalesce((sum(cents_principal)/100),0) from tbl_loans_repay where event_time >='%s' and event_time < '%s' and cents_principal > 0" % (start_time, end_time)
-    service_fee_amt = "select coalesce((sum(cents_serviceq)/100),0) from tbl_loans_repay where event_time >='%s' and event_time < '%s' and cents_serviceq > 0" % (start_time, end_time)
+    lending_txn_count = "select count(*) from tbl_loans where loan_time >= '%s' and loan_time < '%s'" % (
+        start_time, end_time)
+    lbn_count = "select count(*) from tbl_auto_sms_notifications where sms_timestamp >= '%s' and sms_timestamp < '%s' and sms_message='not-subscribed'" % (
+        start_time, end_time)
+    principal_recovery_count = "select count(*) from tbl_loans_repay where event_time >= '%s' and event_time < '%s' and cents_principal > 0" % (
+        start_time, end_time)
+    principal_recovery_amt = "select coalesce((sum(cents_principal)/100),0) from tbl_loans_repay where event_time >='%s' and event_time < '%s' and cents_principal > 0" % (
+        start_time, end_time)
+    service_fee_amt = "select coalesce((sum(cents_serviceq)/100),0) from tbl_loans_repay where event_time >='%s' and event_time < '%s' and cents_serviceq > 0" % (
+        start_time, end_time)
 
     result_lending_txn_count = get_data_without_params(lending_txn_count)
     result_lbn_count = get_data_without_params(lbn_count)
@@ -137,9 +137,11 @@ def get_data():
         f = open(csv_file, 'w')
         c = csv.writer(f)
         # Write headers
-        c.writerow(('Period_start_timestamp', 'Period_end_timestamp', 'lending_txs', 'LBN_counts', 'Principal_recovery_txs', 'Principal_recovery_amount', 'Service_fee_amount'))
+        c.writerow(('Period_start_timestamp', 'Period_end_timestamp', 'lending_txs', 'LBN_counts',
+                    'Principal_recovery_txs', 'Principal_recovery_amount', 'Service_fee_amount'))
         # Write data
-        c.writerow((start_time,end_time,result_lending_txn_count[0], result_lbn_count[0], result_principal_recovery_count[0], result_principal_recovery_amt[0], result_service_fee_amt[0]))
+        c.writerow((start_time, end_time, result_lending_txn_count[0], result_lbn_count[0],
+                    result_principal_recovery_count[0], result_principal_recovery_amt[0], result_service_fee_amt[0]))
     except Exception, e:
         log.error("Error :" + format(e.message))
     finally:
