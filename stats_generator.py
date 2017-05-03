@@ -162,8 +162,8 @@ def sendEmail(message, emails, attachment, filename):
     outer['Subject'] = "OOC Stats"
     outer['From'] = sender
     outer['To'] = ", ".join(recipients)
-    textPart = MIMEText(message, 'html')
-    outer.attach(textPart)
+    textpart = MIMEText(message, 'html')
+    outer.attach(textpart)
     ctype, encoding = mimetypes.guess_type(attachment)
     if ctype is None or encoding is not None:
         # No guess could be made, or the file is encoded (compressed), so
@@ -197,7 +197,7 @@ def sendEmail(message, emails, attachment, filename):
         smtpObj.sendmail(sender, recipients, outer.as_string())
         log.info('Emails sent')
         print "Sent successfully"
-        #smtpObj.quit()
+        # smtpObj.quit()
     except smtplib.SMTPException, e:
         print "Error: Unable to Send"
         log.error("Error :" + format(e.message))
